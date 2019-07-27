@@ -1,0 +1,34 @@
+Attribute VB_Name = "Common"
+Option Explicit
+
+Function Mylastrow(xlsheet As Worksheet, Optional mycolumn As Long = 1) As Double
+    Mylastrow = xlsheet.Cells(Rows.Count, mycolumn).End(xlUp).Row
+End Function
+
+Function date_format(date_used As String) As Date
+    date_used = Left(date_used, 4) & "-" & Mid(date_used, 5, 2) & "-" & Right(date_used, 2)
+    date_format = Format(date_used, "MM-DD-YYYY")
+End Function
+
+Sub ConditColumns(xlsheet As Worksheet, ColumnRange As String)
+    Dim MyLR As Double: MyLR = Mylastrow(xlsheet)
+    Dim MyRange As Range: Set MyRange = xlsheet.Range(xlsheet.Cells(2, xlsheet.Range(ColumnRange).Column).Address & ":" & xlsheet.Cells(MyLR, xlsheet.Range(ColumnRange).Column).Address)
+    
+    With MyRange
+        .FormatConditions.Delete
+        .FormatConditions.Add Type:=xlExpression, Formula1:="= " & xlsheet.Cells(2, xlsheet.Range(ColumnRange).Column).Address(False, True) & "<0"
+        .FormatConditions.Add Type:=xlExpression, Formula1:="= " & xlsheet.Cells(2, xlsheet.Range(ColumnRange).Column).Address(False, True) & ">=0"
+        With .FormatConditions(1)
+            With .Interior
+                .ColorIndex = 3
+            End With
+        End With
+         With .FormatConditions(2)
+            With .Interior
+                .ColorIndex = 4
+            End With
+        End With
+    End With
+    
+End Sub
+

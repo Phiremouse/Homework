@@ -1,0 +1,98 @@
+Attribute VB_Name = "Calcus"
+Option Explicit
+Function TickerCalc(xlsheet_O As Worksheet, i As Double, mytick As String, lastrow As Double) As Variant
+    Dim tmpValue As Double: tmpValue = 0
+    Dim myrow As Double: myrow = i
+    Dim Temp_DN As Double: Temp_DN = 0
+    Dim Temp_DP As Double: Temp_DP = 0
+    Dim Beg_Date As Date
+    Dim End_Date As Date
+    Dim x As Double
+    Dim y As Double
+    While myrow <> lastrow + 1 And xlsheet_O.Range(xlsheet_O.Cells(myrow, 1).Address) = mytick
+        tmpValue = tmpValue + CDbl(xlsheet_O.Range(xlsheet_O.Cells(myrow, 7).Address).Value)
+                
+        'beg date
+        If Beg_Date = #12:00:00 AM# Then
+            Beg_Date = date_format(xlsheet_O.Range(xlsheet_O.Cells(myrow, 2).Address).Value)
+            x = xlsheet_O.Range(xlsheet_O.Cells(myrow, 3).Address)
+        ElseIf Beg_Date > date_format(xlsheet_O.Range(xlsheet_O.Cells(myrow, 2).Address)) Then
+            Beg_Date = date_format(xlsheet_O.Range(xlsheet_O.Cells(myrow, 2).Address))
+            x = xlsheet_O.Range(xlsheet_O.Cells(myrow, 3).Address)
+        End If
+        
+        'end date
+        If End_Date = #12:00:00 AM# Then
+            End_Date = date_format(xlsheet_O.Range(xlsheet_O.Cells(myrow, 2).Address))
+            y = xlsheet_O.Range(xlsheet_O.Cells(myrow, 6).Address)
+        ElseIf End_Date < date_format(xlsheet_O.Range(xlsheet_O.Cells(myrow, 2).Address)) Then
+            End_Date = date_format(xlsheet_O.Range(xlsheet_O.Cells(myrow, 2).Address))
+            y = xlsheet_O.Range(xlsheet_O.Cells(myrow, 6).Address)
+        End If
+        myrow = myrow + 1
+
+    Wend
+    
+    Temp_DN = y - x
+    If x <> 0 Then Temp_DP = Temp_DN / x
+    TickerCalc = Array(tmpValue, Temp_DN, Temp_DP)
+    
+End Function
+
+Sub CreateOverallMetrics(xlsheet As Worksheet, MType As String, Optional Starter_col As Long = 6)
+    Dim i As Double
+    Dim H_Ticker As String
+    Dim H_Value As Double
+    Dim TempColumn As Long: TempColumn = 0
+    Dim TempDESCR As String: TempDESCR = ""
+    Dim SwitchType As String: SwitchType = ""
+    Dim Dectype As Boolean: Dectype = False
+    
+    Select Case MType
+        Case "GP_Increase"
+            SwitchType = "Biggest"
+            TempColumn = 3
+            TempDESCR = "Greatest % Increase"
+            Dectype = True
+        Case "GP_Descrase"
+            SwitchType = "Smallest"
+            TempColumn = 3
+            TempDESCR = "Greatest % Decrease"
+            Dectype = True
+        Case "G_Volume"
+            SwitchType = "Biggest"
+            TempColumn = 4
+            TempDESCR = "Greatest Total Volume"
+            Dectype = False
+        Case Else
+            MsgBox "Metric Not Known!!!!", vbCritical
+            Exit Sub
+    End Select
+        
+        For i = 2 To Mylastrow(xlsheet, 1)
+            If i = 2 Then
+                H_Value = xlsheet.Cells(i, TempColumn)
+                H_Ticker = xlsheet.Cells(i, 1)
+            Else
+                If SwitchType = "Biggest" Then
+                    If xlsheet.Cells(i, TempColumn) > H_Value Then
+                        H_Value = xlsheet.Cells(i, TempColumn)
+                        H_Ticker = xlsheet.Cells(i, 1)
+                    End If
+                ElseIf SwitchType = "Smallest" Then
+                    If xlsheet.Cells(i, TempColumn) < H_Value Then
+                        H_Value = xlsheet.Cells(i, TempColumn)
+                        H_Ticker = xlsheet.Cells(i, 1)
+                    End If
+                End If
+            End If
+        Next i
+        
+        xlsheet.Cells(Mylastrow(xlsheet, Starter_col) + 1, Starter_col) = TempDESCR
+        xlsheet.Cells(Mylastrow(xlsheet, Starter_col), Starter_col + 1) = H_Ticker
+        If Dectype Then
+            xlsheet.Cells(Mylastrow(xlsheet, Starter_col), Starter_col + 2) = Format(H_Value, "Percent")
+        Else
+            xlsheet.Cells(Mylastrow(xlsheet, Starter_col), Starter_col + 2) = H_Value
+        End If
+End Sub

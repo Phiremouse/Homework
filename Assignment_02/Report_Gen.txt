@@ -1,0 +1,49 @@
+Attribute VB_Name = "Report_Gen"
+Option Explicit
+
+Function CreateSummarySheet(xlbook As Workbook, xlsheet As Worksheet) As Worksheet
+    
+    Dim tempsheet As Worksheet
+    Set tempsheet = xlbook.Worksheets.Add(after:=xlbook.Worksheets(xlbook.Sheets.Count))
+    tempsheet.Name = xlsheet.Name & "_Summary"
+    tempsheet.Cells(1, 1).Value = "<Ticker>"
+    tempsheet.Cells(1, 2).Value = "<Yearly Change>"
+    tempsheet.Cells(1, 3).Value = "<Percent Change>"
+    tempsheet.Cells(1, 4).Value = "<Total Volume>"
+    
+    tempsheet.Cells(1, 6).Value = "<Metric>"
+    tempsheet.Cells(1, 7).Value = "<Ticker>"
+    tempsheet.Cells(1, 8).Value = "<Value>"
+    Set CreateSummarySheet = tempsheet
+
+End Function
+Sub CreateTickerSummary(xlsheet_O As Worksheet, xlsheet_D As Worksheet)
+    Dim CurrentTicker As String: CurrentTicker = ""
+    Dim CheckTicker As String: CheckTicker = ""
+    Dim tempvalue() As Variant
+    Dim DeltaEnd_N As Double: DeltaEnd_N = 0
+    Dim DeltaEnd_P As Double: DeltaEnd_P = 0
+    Dim lastrow_O As Double: lastrow_O = Mylastrow(xlsheet_O, 1)
+    Dim lastrow_D As Double: lastrow_D = 0
+    Dim i As Double: i = 0
+    
+    For i = 2 To lastrow_O
+        If xlsheet_O.Range(xlsheet_O.Cells(i, 1).Address) <> CheckTicker Or i = 1 Then
+            CheckTicker = xlsheet_O.Range(xlsheet_O.Cells(i, 1).Address).Value
+            tempvalue = TickerCalc(xlsheet_O, i, CheckTicker, lastrow_O)
+            lastrow_D = Mylastrow(xlsheet_D, 1) + 1
+            xlsheet_D.Range(xlsheet_D.Cells(lastrow_D, 1).Address).Value = CheckTicker
+            xlsheet_D.Range(xlsheet_D.Cells(lastrow_D, 2).Address).Value = tempvalue(1)
+            xlsheet_D.Range(xlsheet_D.Cells(lastrow_D, 3).Address).Value = Format(tempvalue(2), "Percent")
+            xlsheet_D.Range(xlsheet_D.Cells(lastrow_D, 4).Address).Value = tempvalue(0)
+        End If
+    Next i
+    ConditColumns xlsheet_D, "B:B"
+    CreateOverallMetrics xlsheet_D, "GP_Increase"
+    CreateOverallMetrics xlsheet_D, "GP_Descrase"
+    CreateOverallMetrics xlsheet_D, "G_Volume"
+End Sub
+
+
+
+

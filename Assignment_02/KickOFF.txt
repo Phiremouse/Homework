@@ -1,0 +1,22 @@
+Attribute VB_Name = "KickOFF"
+Option Explicit
+
+Sub Runme()
+    Dim xlbook As Workbook: Set xlbook = ThisWorkbook
+    Dim xlsheet_O As Worksheet
+    Dim xlsheet_D As Worksheet
+    Dim ws As Worksheet
+    Dim i As Integer: i = 0
+    Application.ScreenUpdating = False
+    Debug.Print Now()
+    For Each ws In xlbook.Worksheets
+        Set xlsheet_O = ws
+        'create summary sheet
+        Set xlsheet_D = CreateSummarySheet(xlbook, xlsheet_O)
+        'populate summary sheet
+        CreateTickerSummary xlsheet_O, xlsheet_D
+        xlsheet_D.UsedRange.Columns.AutoFit
+    Next ws
+    Debug.Print Now
+    Application.ScreenUpdating = True
+End Sub
