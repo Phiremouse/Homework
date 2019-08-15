@@ -1,0 +1,4 @@
+1. The amount of the female player base is fractional compared to the male player base but their overall average purchase price and average total per person is comparable. 
+2. As the 20-24 seems to be the core demo and biggest revenue generator I would be worried about the spending patterns in 15-19 and 25-29.  These are your incoming main core players and your use to be main core. I would want to study more ways to up the spending in the 15-19 group and find ways to retain player base after the core age group.
+3. Most popular items show that price doesn’t really dictate how many are bought. I would wonder if some items are too high or too low. Then review the stats of these items to make sure it doesn’t throw off gameplay and the actual in-game economy.
+
