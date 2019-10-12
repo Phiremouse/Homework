@@ -70,7 +70,7 @@ def scrape():
     html = tempbrowser.html
     soup = bs(html,'html.parser')
     tempbrowser.quit()
-    OutputSoup(soup)
+    #OutputSoup(soup)
     # grab the latest tweet and be careful its a weather tweet
     
     tw=soup.find_all('p',class_='TweetTextSize TweetTextSize--normal js-tweet-text tweet-text')
